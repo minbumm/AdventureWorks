@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace minbumm.Advs.Win.WinApp.Controller
 {
@@ -33,6 +35,25 @@ namespace minbumm.Advs.Win.WinApp.Controller
             {
                 menuEvents.Remove(handler);
             }
+        }
+        public static void InvpkkeMenuEventHandler(string key, object sender, EventArgs e) 
+        {
+            var handler = menuEvents.Where(m => m.Key == key).FirstOrDefault();
+
+            if (handler.Key != null && handler.Value != null)
+            {
+                handler.Value(sender, e);
+            }
+        }
+
+        static private void menuItem_Click(object sender, EventArgs e) 
+        {
+            Debug.WriteLine(sender.ToString());
+            Debug.WriteLine(e.ToString());
+
+            ToolStripMenuItem tsItem = sender as ToolStripMenuItem;
+            string key = tsItem.Tag as string;
+            MainMenuCtrl.InvpkkeMenuEventHandler(key, sender, e);
         }
     }
 }
