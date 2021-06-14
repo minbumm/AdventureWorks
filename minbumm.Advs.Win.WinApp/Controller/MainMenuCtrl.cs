@@ -55,5 +55,22 @@ namespace minbumm.Advs.Win.WinApp.Controller
             string key = tsItem.Tag as string;
             MainMenuCtrl.InvpkkeMenuEventHandler(key, sender, e);
         }
+
+        private static Boolean PreventDuplicateShow(string targetFormName) 
+        {
+            foreach (Form openForm in Application.OpenForms)
+            {
+                if (openForm.Name == targetFormName)
+                {
+                    if (openForm.WindowState == FormWindowState.Minimized)
+                    {
+                        openForm.WindowState = FormWindowState.Normal;
+                    }
+                    openForm.Activate();
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
