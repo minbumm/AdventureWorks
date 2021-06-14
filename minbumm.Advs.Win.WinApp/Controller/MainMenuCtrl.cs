@@ -14,5 +14,16 @@ namespace minbumm.Advs.Win.WinApp.Controller
         {
             
         }
+
+        public static void AddMenuEventHandler(string key, EventHandler eventHandler) 
+        {
+            var hander = menuEvents.Where(e => e.Key == key).FirstOrDefault();
+            if (hander.Key !=  null)
+            {
+                menuEvents.Remove(hander);
+            }
+
+            menuEvents.Add(new KeyValuePair<string, EventHandler>(key, eventHandler));
+        }
     }
 }
