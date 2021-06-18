@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
+using minbumm.Advs.DataModel.DBCommandConfigSection;
 
 namespace minbumm.Advs.Win.Common
 {

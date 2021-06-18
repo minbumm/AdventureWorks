@@ -11,26 +11,26 @@ namespace minbumm.Advs.DataModel.DBCommandConfigSection
     {
         public DbCommandConfig() { }
         [ConfigurationProperty("CommandID", IsRequired = true)]
-        public string CommandID 
+        public string CommandID
         {
-            get 
+            get
             {
                 return (string)this["CommandID"];
             }
-            set 
+            set
             {
                 this["CommandID"] = value;
             }
         }
-        
+
         [ConfigurationProperty("Text", IsRequired = true)]
-        public string Text 
+        public string Text
         {
-            get 
+            get
             {
                 return (string)this["Text"];
             }
-            set 
+            set
             {
                 this["Text"] = value;
             }
@@ -49,3 +49,4 @@ namespace minbumm.Advs.DataModel.DBCommandConfigSection
             }
         }
     }
+}

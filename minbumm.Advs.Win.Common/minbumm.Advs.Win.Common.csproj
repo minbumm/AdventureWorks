@@ -8,4 +8,8 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\minbumm.Advs.DataModel\minbumm.Advs.DataModel.csproj" />
+  </ItemGroup>
+
 </Project>
