@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "minbumm.Advs.Win.FrameWorks
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "minbumm.Advs.DataModel", "minbumm.Advs.DataModel\minbumm.Advs.DataModel.csproj", "{1CDA3E83-CAB9-49B0-864F-21AB61B51702}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "minbumm.Advs.Win.Facade", "minbumm.Advs.Win.Facade\minbumm.Advs.Win.Facade.csproj", "{B896DB50-C28A-4EA3-8700-DC05582410E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{1CDA3E83-CAB9-49B0-864F-21AB61B51702}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CDA3E83-CAB9-49B0-864F-21AB61B51702}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CDA3E83-CAB9-49B0-864F-21AB61B51702}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B896DB50-C28A-4EA3-8700-DC05582410E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B896DB50-C28A-4EA3-8700-DC05582410E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B896DB50-C28A-4EA3-8700-DC05582410E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B896DB50-C28A-4EA3-8700-DC05582410E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
