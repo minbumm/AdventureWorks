@@ -1,4 +1,5 @@
-﻿namespace minbumm.Advs.Win.WinAppSolution
+﻿
+namespace minbumm.Advs.Win.WinAppSolution
 {
     partial class UserControl1
     {

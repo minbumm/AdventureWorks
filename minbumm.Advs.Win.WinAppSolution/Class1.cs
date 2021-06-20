@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace minbumm.Advs.DataModel
+namespace minbumm.Advs.Win.WinAppSolution
 {
     public class Class1
     {
