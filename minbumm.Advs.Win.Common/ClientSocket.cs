@@ -35,6 +35,6 @@ namespace minbumm.Advs.Win.Common
         // The reponse from the remote device.
         private string response = string.Empty;
 
-        S
+        
     }
 }
