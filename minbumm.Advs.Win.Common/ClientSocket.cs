@@ -108,6 +108,7 @@ namespace minbumm.Advs.Win.Common
             Close();
         }
 
+
         private void SendCallback(IAsyncResult ar) 
         {
             try
@@ -154,6 +155,7 @@ namespace minbumm.Advs.Win.Common
             }
         }
 
+
         private void ConnectCallback(IAsyncResult ar) 
         {
             try
@@ -182,6 +184,89 @@ namespace minbumm.Advs.Win.Common
             {
                 Debug.Write("ConnectCallback [Exception] Error : {0} ", ex.Message.ToString());
             }
+
+        }
+
+        public void Connect()
+        {
+            IPAddress ipAddress = null;
+            if (tcpServerIP.ToLower().Equals("localhost"))
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                ipAddress = ipHostInfo.AddressList.Where(a => a.AddressFamily == AddressFamily.InterNetwork).FirstOrDefault();
+            }
+            else
+            {
+                ipAddress = IPAddress.Parse(tcpServerIP);
+            }
+            IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
+
+            //Connect to the remote endpoont
+            Socket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), Socket);
+
+        }
+
+        public void ReceiveCallback(IAsyncResult ar) 
+        {
+            try
+            {
+                //Retrieve the state object and the client socket
+                //from the asynchronous state object.
+                ClientSocketStateObject state = (ClientSocketStateObject)ar.AsyncState;
+                Socket client = state.workSocket;
+
+                int bytesRead = client.EndReceive(ar);
+
+                if (bytesRead > 0)
+                {
+                    // There might be more data, so store the data received so far.
+                    state.sb.Append(encoding.GetString(state.buffer, 0, bytesRead));
+
+                    response = state.sb.ToString();
+
+                    if (response.IndexOf("<EOF>") > -1)
+                    {
+                        if (OnReceivde != null)
+                        {
+                            OnReceivde(this, response);
+                        }
+                        // Singnal that all bytes have been received.
+                        receiveDone.Set();
+
+                    }
+                    else
+                    {
+                        // Get the rest of the data.
+                        client.BeginReceive(state.buffer, 0, ClientSocketStateObject.BufferSize, 0,
+                            new AsyncCallback(ReceiveCallback), state);
+                    }
+                }
+            }
+            catch (SocketException skex) 
+            {
+                Debug.WriteLine(skex.ToString());
+                if (OnDisconnect != null)
+                {
+                    OnDisconnect(this);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString());
+            }
+        }
+
+
+        public class ClientSocketStateObject 
+        {
+            //Client socket
+            public Socket workSocket = null;
+            //Size of receive buffer
+            public const int BufferSize = 256;
+            // Receive buffer
+            public byte[] buffer = new byte[BufferSize];
+            //Receiving data string
+            public StringBuilder sb = new StringBuilder();
 
         }
     }
