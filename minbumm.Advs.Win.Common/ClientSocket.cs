@@ -86,9 +86,6 @@ namespace minbumm.Advs.Win.Common
             }
         }
 
-
-
-
         public void SendAndReceiveMesaage(string sendData) 
         {
             // Establish the remote endpoint for the socket
@@ -206,6 +203,7 @@ namespace minbumm.Advs.Win.Common
 
         }
 
+
         public void ReceiveCallback(IAsyncResult ar) 
         {
             try
@@ -256,18 +254,39 @@ namespace minbumm.Advs.Win.Common
             }
         }
 
-
-        public class ClientSocketStateObject 
+        public void Receive() 
         {
-            //Client socket
-            public Socket workSocket = null;
-            //Size of receive buffer
-            public const int BufferSize = 256;
-            // Receive buffer
-            public byte[] buffer = new byte[BufferSize];
-            //Receiving data string
-            public StringBuilder sb = new StringBuilder();
+            try
+            {
+                // Create the state object
+                ClientSocketStateObject state = new ClientSocketStateObject();
+                state.workSocket = Socket;
 
+                // Begin receiving the data from the remote device
+                socket.BeginReceive(state.buffer, 0, ClientSocketStateObject.BufferSize, 0,
+                    new AsyncCallback(ReceiveCallback), state);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString());
+            }
         }
+        public override string ToString()
+        {
+            return Socket != null ? Socket.RemoteEndPoint.ToString() : "";
+        }
+
+    }
+    public class ClientSocketStateObject
+    {
+        //Client socket
+        public Socket workSocket = null;
+        //Size of receive buffer
+        public const int BufferSize = 256;
+        // Receive buffer
+        public byte[] buffer = new byte[BufferSize];
+        //Receiving data string
+        public StringBuilder sb = new StringBuilder();
+
     }
 }
