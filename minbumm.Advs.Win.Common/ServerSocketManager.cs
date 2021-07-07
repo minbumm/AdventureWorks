@@ -40,6 +40,14 @@ namespace minbumm.Advs.Win.Common
         public List<ClientSocket> Clients { get => clients; set => clients = value; }
         public Socket ServerSocket { get => serverSocket; set => serverSocket = value; }
 
+        
+        Timer timer = null;
 
+        public ServerSocketManager() 
+        {
+            //CREATE a TCP/IP Socket
+            ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        }
     }
 }
+
