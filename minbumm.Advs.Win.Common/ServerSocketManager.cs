@@ -1,7 +1,9 @@
 ﻿using minbumm.Advs.DataModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -89,26 +91,130 @@ namespace minbumm.Advs.Win.Common
             this.port = port;
         }
 
-        public ServerSocketManager(Encoding encoding) : this() 
+        public ServerSocketManager(Encoding encoding) : this()
         {
             this.encoding = encoding;
             this.port = port;
         }
-
-        public void Start() 
+        public void Start()
         {
             Thread sockT = new Thread(new ThreadStart(StartListening));
+            sockT.Start();
         }
-        private void StartListening() 
+
+        public void Stop()
         {
-            //Data buffer for incoming data.
-            byte[] bytes = new byte[1024];
+            StopListening();
 
-            //Establish the local endpoint for the socket.
-            //The DNS name of the computer
-            //running the listener is "host.contoso.com"
+            foreach (var client in Clients)
+            {
+                client.Close();
+            }
+
+            Clients.Clear();
+        }
+
+        public void AddClient(ClientSocket client)
+        {
+            client.OnDisconnect += Client_OnDisconnect;
+            Clients.Add(client);
+        }
+
+        private void Client_OnDisconnect(ClientSocket sender)
+        {
+            RemoveClient(sender);
+            if (OnDisconnect != null)
+                OnDisconnect(sender);
+        }
+
+        public void RemoveClient(ClientSocket client)
+        {
+            if (Clients.Contains(client))
+            {
+                client.Close();
+                Clients.Remove(client);
+            }
+        }
+
+        private void StartListening()
+        {
+            // Data buffer for incoming data.
+            byte[] bytes = new Byte[1024];
+
+            // Establish the local endpoint for the socket.
+            // The DNS name of the computer
+            // running the listener is "host.contoso.com".
+            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress ipAddress = ipHostInfo.AddressList.Where(a => a.AddressFamily == AddressFamily.InterNetwork).FirstOrDefault();
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
+            listeningFlag = true;
+
+            // Bind the socket to the local endpoint and listen for incoming connections.
+            try
+            {
+                ServerSocket.Bind(localEndPoint);
+                ServerSocket.Listen(100);
+
+                while (listeningFlag)
+                {
+                    // Set the event to nonsignaled state.
+                    allDone.Reset();
+
+                    // Start an asynchronous socket to listen for connections.
+                    Debug.WriteLine("Waiting for a connection...");
+                    ServerSocket.BeginAccept(
+                        new AsyncCallback(AcceptCallback),
+                        ServerSocket);
+
+                    // Wait until a connection is made before continuing.
+                    allDone.WaitOne();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                throw ex;
+            }
 
         }
+        private void StopListening()
+        {
+            listeningFlag = false;
+            allDone.Set();
+            sockT = null;
+
+        }
+
+        private void AcceptCallback(IAsyncResult ar)
+        {
+            // Signal the main thread to continue.
+            allDone.Set();
+
+            // Get the socket that handles the client request.
+            Socket listener = (Socket)ar.AsyncState;
+            Socket handler = listener.EndAccept(ar);
+
+            if (OnAccept != null)
+            {
+                //OnAccept(handler);
+            }
+
+        }
+
+    }
+
+    // State object for receiving data from remote device
+    public class ServerSocketStateObject
+    {
+        // Client socket
+        public Socket workSocket = null;
+        // Size of receive buffer
+        public const int BufferSize = 1024;
+        // Receive buffer
+        public byte[] buffer = new byte[BufferSize];
+        // Receiving data string
+        public StringBuilder sb = new StringBuilder();
     }
 }
 
