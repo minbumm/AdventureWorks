@@ -47,6 +47,67 @@ namespace minbumm.Advs.Win.Common
         {
             //CREATE a TCP/IP Socket
             ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            timer = new Timer(new TimerCallback(CheckClientSocketState), null, 10000 , 10000 );
+        }
+        public void CheckClientSocketState(object state) 
+        {
+            List<ClientSocket> removingClients = null;
+            if (Clients.Count > 0)
+            {
+                foreach (var client in clients)
+                {
+                    if (!client.Connected)
+                    {
+                        if (removingClients == null)
+                        {
+                            removingClients = new List<ClientSocket>();
+                        }
+                        removingClients.Add(client);
+
+                        continue;
+                    }
+                    client.Send($"{DateTime.Now.ToString()}:ping:<EOF>");
+                }
+            }
+            if (removingClients != null && removingClients.Count > 0)
+            {
+                foreach (var client in removingClients)
+                {
+                    clients.Remove(client);
+
+                    if (OnDisconnect != null)
+                    {
+                        OnDisconnect(client);
+                    }
+                }
+            }
+
+        }
+
+        public ServerSocketManager(int port) : this() 
+        {
+            this.port = port;
+        }
+
+        public ServerSocketManager(Encoding encoding) : this() 
+        {
+            this.encoding = encoding;
+            this.port = port;
+        }
+
+        public void Start() 
+        {
+            Thread sockT = new Thread(new ThreadStart(StartListening));
+        }
+        private void StartListening() 
+        {
+            //Data buffer for incoming data.
+            byte[] bytes = new byte[1024];
+
+            //Establish the local endpoint for the socket.
+            //The DNS name of the computer
+            //running the listener is "host.contoso.com"
+
         }
     }
 }
