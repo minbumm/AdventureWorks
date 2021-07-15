@@ -55,5 +55,49 @@ namespace minbumm.Advs.Win.Common
             return output.ToString();
         }
 
+        public static string GenerateUpdate(DataRow dr, string[] removeFields)
+        {
+            if (dr == null)
+            {
+                throw new ArgumentNullException("dataRow");
+            }
+
+            DataTable table = dr.Table;
+
+            if (string.IsNullOrEmpty(table.TableName) || table.TableName.Trim() == "")
+            {
+                throw new ArgumentException("tablename must be set on table");
+            }
+
+            var excludeNames = new SortedList<string, string>();
+            if (removeFields != null)
+            {
+                foreach (string removeField in removeFields)
+                {
+                    excludeNames.Add(removeField.ToUpper(), removeField.ToUpper());
+                }
+            }
+
+            var names = new List<string>();
+            foreach (DataColumn col in table.Columns)
+            {
+                if (!excludeNames.ContainsKey(col.ColumnName.ToUpper()))
+                {
+                    names.Add("[" + col.ColumnName + "]");
+                }
+            }
+
+            var output = new StringBuilder();
+
+            output.AppendFormat("UPDATE [Sales].[{0}]\n\t SET ", table.TableName);
+
+            output.Append(GetUpdateColumnValues(table, dr, excludeNames));
+
+            output.AppendFormat("\n\t Where {0}", dr["wh"].ToString());
+
+
+            return output.ToString();
+        }
+
     }
 }
