@@ -55,6 +55,40 @@ namespace minbumm.Advs.Win.Common
             return output.ToString();
         }
 
+        /// <summary>
+        /// Gets the column values list for an insert statement
+        /// </summary>
+        /// <param name="table">The table</param>
+        /// <param name="row">a data row</param>
+        /// <param name="excludeNames">A list of fields to be excluded</param>
+        /// <returns></returns>
+        public static string GetInsertColumnValues(DataTable table, DataRow row, SortedList<string, string> excludeNames)
+        {
+            var output = new StringBuilder();
+
+            bool firstColumn = true;
+
+            foreach (DataColumn col in table.Columns)
+            {
+                if (!excludeNames.ContainsKey(col.ColumnName.ToUpper()))
+                {
+                    if (firstColumn)
+                    {
+                        firstColumn = false;
+                    }
+                    else
+                    {
+                        output.Append(", ");
+                    }
+
+                    output.Append(GetColumnValue(row, col));
+                }
+            }
+
+            return output.ToString();
+        }
+
+
         public static string GenerateUpdate(DataRow dr, string[] removeFields)
         {
             if (dr == null)
@@ -99,5 +133,7 @@ namespace minbumm.Advs.Win.Common
             return output.ToString();
         }
 
+
     }
+
 }
