@@ -8,5 +8,6 @@ namespace minbumm.Advs.Win.Common
 {
     class FirewallMgr
     {
+
     }
 }
