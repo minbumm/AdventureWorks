@@ -9,7 +9,10 @@ namespace minbumm.Advs.Win.Common
 {
     public static class SqlBuilderHelper
     {
-        public static string GenerateInsert(DataRow dr, string[] removeFileds) 
+        #region Public Methods
+
+
+        public static string GenerateInsert(DataRow dr, string[] removeFields)
         {
             if (dr == null)
             {
@@ -18,10 +21,11 @@ namespace minbumm.Advs.Win.Common
 
             DataTable table = dr.Table;
 
-            if (string.IsNullOrEmpty(table.TableName) || table.TableName.Trim() =="")
+            if (string.IsNullOrEmpty(table.TableName) || table.TableName.Trim() == "")
             {
-                throw new ArgumentNullException("tablename must be set on table");
+                throw new ArgumentException("tablename must be set on table");
             }
+
             var excludeNames = new SortedList<string, string>();
             if (removeFields != null)
             {
@@ -51,43 +55,8 @@ namespace minbumm.Advs.Win.Common
             output.Append(")");
 
 
-
             return output.ToString();
         }
-
-        /// <summary>
-        /// Gets the column values list for an insert statement
-        /// </summary>
-        /// <param name="table">The table</param>
-        /// <param name="row">a data row</param>
-        /// <param name="excludeNames">A list of fields to be excluded</param>
-        /// <returns></returns>
-        public static string GetInsertColumnValues(DataTable table, DataRow row, SortedList<string, string> excludeNames)
-        {
-            var output = new StringBuilder();
-
-            bool firstColumn = true;
-
-            foreach (DataColumn col in table.Columns)
-            {
-                if (!excludeNames.ContainsKey(col.ColumnName.ToUpper()))
-                {
-                    if (firstColumn)
-                    {
-                        firstColumn = false;
-                    }
-                    else
-                    {
-                        output.Append(", ");
-                    }
-
-                    output.Append(GetColumnValue(row, col));
-                }
-            }
-
-            return output.ToString();
-        }
-
 
         public static string GenerateUpdate(DataRow dr, string[] removeFields)
         {
@@ -133,7 +102,118 @@ namespace minbumm.Advs.Win.Common
             return output.ToString();
         }
 
+        /// <summary>
+        /// Gets the column values list for an Update statement
+        /// </summary>
+        /// <param name="table">The table</param>
+        /// <param name="row">a data row</param>
+        /// <param name="excludeNames">A list of fields to be excluded</param>
+        /// <returns></returns>
+        public static string GetUpdateColumnValues(DataTable table, DataRow row, SortedList<string, string> excludeNames)
+        {
+            var output = new StringBuilder();
 
+            bool firstColumn = true;
+
+            foreach (DataColumn col in table.Columns)
+            {
+                if (!excludeNames.ContainsKey(col.ColumnName.ToUpper()))
+                {
+                    if (firstColumn)
+                    {
+                        firstColumn = false;
+                    }
+                    else
+                    {
+                        output.Append(", ");
+                    }
+
+                    output.AppendFormat("{0}={1}", col.ColumnName, GetColumnValue(row, col));
+                }
+            }
+
+            return output.ToString();
+        }
+
+
+        /// <summary>
+        /// Gets the column values list for an insert statement
+        /// </summary>
+        /// <param name="table">The table</param>
+        /// <param name="row">a data row</param>
+        /// <param name="excludeNames">A list of fields to be excluded</param>
+        /// <returns></returns>
+        public static string GetInsertColumnValues(DataTable table, DataRow row, SortedList<string, string> excludeNames)
+        {
+            var output = new StringBuilder();
+
+            bool firstColumn = true;
+
+            foreach (DataColumn col in table.Columns)
+            {
+                if (!excludeNames.ContainsKey(col.ColumnName.ToUpper()))
+                {
+                    if (firstColumn)
+                    {
+                        firstColumn = false;
+                    }
+                    else
+                    {
+                        output.Append(", ");
+                    }
+
+                    output.Append(GetColumnValue(row, col));
+                }
+            }
+
+            return output.ToString();
+        }
+
+        /// <summary>
+        /// Gets the insert column value, adding quotes and handling special formats
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <param name="column">The column</param>
+        /// <returns></returns>
+        public static string GetColumnValue(DataRow row, DataColumn column)
+        {
+            string output = "";
+
+            if (row[column.ColumnName] == DBNull.Value)
+            {
+                output = "NULL";
+            }
+            else
+            {
+                if (column.DataType == typeof(bool))
+                {
+                    output = (bool)row[column.ColumnName] ? "1" : "0";
+                }
+                else
+                {
+                    //bool addQuotes = false;
+                    //addQuotes = addQuotes || (column.DataType == typeof(string));
+                    //addQuotes = addQuotes || (column.DataType == typeof(DateTime));
+
+                    if (column.DataType == typeof(string))
+                    {
+                        output = "N'" + row[column.ColumnName].ToString() + "'";
+                    }
+                    else if (column.DataType == typeof(DateTime))
+                    {
+                        output = "CAST('" + ((DateTime)row[column.ColumnName]).ToString("yyyy-MM-dd hh:mm:ss") + "' AS DATETIME)";
+                    }
+                    else
+                    {
+                        output = row[column.ColumnName].ToString();
+                    }
+                }
+            }
+
+            return output;
+        }
+
+        #endregion Public Methods
     }
 
 }
